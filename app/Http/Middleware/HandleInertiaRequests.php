@@ -34,6 +34,8 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+
+            'materis' => $request->user() ? $request->user()->materis()->where('deleted', 0)->get() : [],
         ];
     }
 }

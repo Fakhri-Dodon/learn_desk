@@ -47,4 +47,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function materis()
+    {
+        return $this->hasMany(Materi::class);
+    }
+
+    public function assignments()
+    {
+        return $this->hasMany(Assignment::class);
+    }
 }
