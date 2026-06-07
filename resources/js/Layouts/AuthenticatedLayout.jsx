@@ -21,8 +21,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
-    const { auth, materis } = usePage().props;
+    const pageProps = usePage().props;
+    const user = pageProps.auth?.user || {
+        name: 'Guest User',
+        role: 'student',
+        email: 'user@example.com'
+    };
+    const { auth, materis = [] } = pageProps;
     const { url } = usePage();
 
     const canCreateMateri =
@@ -30,6 +35,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
     const StudentTask = user?.role === "student";
 
+    // State for interactive elements
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,30 +111,30 @@ export default function AuthenticatedLayout({ header, children }) {
         });
     };
 
-    // Navigation menu items
+    // Navigation menu items with dynamic active states
     const navItems = [
         {
             label: "Dashboard",
             icon: faHouse,
             href: route("dashboard"),
-            active: url === route("dashboard"),
+            active: url === "/dashboard" || url.endsWith("/dashboard"),
         },
         {
             label: "Manage Materials",
             icon: faBook,
-            href: "#",
-            active: url.includes("materi"),
+            href: "/materi",
+            active: url.includes("/materi") && !url.includes("/materi/"),
         },
         {
             label: "Assignments",
             icon: faTasks,
-            href: "/tugas-saya",
-            active: url.includes("assignment") || url.includes("tugas-saya"),
+            href: route("student.assignments.index"),
+            active: url.includes("tugas-saya") || url.includes("assignment"),
         },
         {
             label: "Grading",
             icon: faStar,
-            href: "#",
+            href: "/grading",
             active: url.includes("grading"),
         },
     ];
