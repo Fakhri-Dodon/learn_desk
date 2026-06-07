@@ -122,8 +122,8 @@ export default function AuthenticatedLayout({ header, children }) {
         {
             label: "Assignments",
             icon: faTasks,
-            href: route("assignments.index"),
-            active: url.includes("assignment"),
+            href: "/tugas-saya",
+            active: url.includes("assignment") || url.includes("tugas-saya"),
         },
         {
             label: "Grading",
