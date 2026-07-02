@@ -5,6 +5,9 @@ export default function Badge({ label, variant = 'primary', className = '' }) {
         warning: 'bg-amber-100 text-amber-800',
         danger: 'bg-red-100 text-red-800',
         gray: 'bg-gray-100 text-gray-800',
+        blue: 'bg-blue-100 text-blue-800',
+        yellow: 'bg-yellow-100 text-yellow-800',
+        pink: 'bg-pink-100 text-pink-800',
     };
 
     return (

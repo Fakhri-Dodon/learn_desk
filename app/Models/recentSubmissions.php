@@ -2,23 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class assignment extends Model
+class recentSubmissions extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'materi_id',
+        'assignment_id',
         'user_id',
-        'submission_type',
-        'google_form_link',
         'due_date',
-        'description',
         'status',
-        'answer',
-        'score',
         'deleted', 
         'created_by', 
         'updated_by', 
@@ -26,9 +18,9 @@ class assignment extends Model
         'deleted_at'
     ];
 
-    public function materi()
+    public function assignment()
     {
-        return $this->belongsTo(Materi::class);
+        return $this->belongsTo(Assignment::class);
     }
 
     public function user()

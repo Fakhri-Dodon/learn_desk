@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MateriController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\StudentAssignmentController;
+use App\Http\Controllers\UserManagementsController;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -33,10 +34,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('/materi', [MateriController::class, 'store'])->name('materi.store');
+    Route::get('/materi', [MateriController::class, 'index'])->name('materi.index');
+    Route::get('/materi/create', [MateriController::class, 'create'])->name('materi.create');
+    Route::post('/materi/store', [MateriController::class, 'store'])->name('materi.store');
+    Route::patch('/materi/{materi}/update', [MateriController::class, 'update'])->name('materi.update');
+    Route::delete('/materi/{materi}/delete', [MateriController::class, 'destroy'])->name('materi.destroy');
     Route::get('/materi/{slug}', [MateriController::class, 'show'])->name('materi.show');
-    Route::patch('/materi/{materi}', [MateriController::class, 'update'])->name('materi.update');
-    Route::delete('/materi/{materi}', [MateriController::class, 'destroy'])->name('materi.destroy');
 });
 
 Route::middleware('auth')->group(function () {
@@ -49,6 +52,13 @@ Route::middleware('auth')->group(function () {
     // Route untuk Guru mengecek dan menilai tugas
     Route::get('/assignment/review/{assignment}', [AssignmentController::class, 'review'])->name('assignment.review');
     Route::post('/assignment/review/{assignment}', [AssignmentController::class, 'updateScore'])->name('assignment.updateScore');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/users-managements', [UserManagementsController::class, 'index'])->name('users.index');
+    Route::post('/users-managements/store', [UserManagementsController::class, 'store'])->name('users.store');
+    Route::patch('/users-managements/{user}/update', [UserManagementsController::class, 'update'])->name('users.update');
+    Route::delete('/users-managements/{user}/delete', [UserManagementsController::class, 'destroy'])->name('users.destroy');
 });
 
 require __DIR__.'/auth.php';

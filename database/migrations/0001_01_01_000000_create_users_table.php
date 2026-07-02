@@ -18,7 +18,13 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('role')->default('student');
+            $table->integer('class')->nullable();
             $table->rememberToken();
+            $table->tinyInteger('deleted')->default(0);
+            $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamps();
         });
 

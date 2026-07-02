@@ -3,7 +3,7 @@ import { faBook } from '@fortawesome/free-solid-svg-icons';
 
 export default function WelcomeBanner({
     userName = 'Professor',
-    pendingAssignments = 12,
+    pendingAssignments = assignmentsCount || 0,
     moduleName = 'Advanced Quantum Mechanics',
     onAction = null,
 }) {

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\assignment;
 use App\Models\Materi;
 use App\Models\User;
+use App\Models\recentSubmissions;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 
 class AssignmentController extends Controller
 {
@@ -15,7 +17,7 @@ class AssignmentController extends Controller
      */
     public function index(Materi $materi) 
     {
-        $students = User::where('role', 'student')->get()->map(function($student) use ($materi) {
+        $students = User::where('role', 'student')->where('class', $materi->class)->get()->map(function($student) use ($materi) {
             
             $tugas = Assignment::where('user_id', $student->id)
                                         ->where('materi_id', $materi->id)
@@ -73,6 +75,14 @@ class AssignmentController extends Controller
                     'status' => 'Belum Mengumpulkan',
                 ]
             );
+            recentSubmissions::create([
+                'assignment_id' => Assignment::where('materi_id', $materi->id)->where('user_id', $studentId)->first()->id,
+                'user_id' => $studentId,
+                'due_date' => $request->due_date,
+                'status' => 'Needs Feedback',
+                'created_by' => Auth::id(),
+                'created_at' => now(),
+            ]);
         }
 
         return back()->with('success', 'Tugas berhasil diberikan kepada murid terpilih!');
@@ -95,6 +105,15 @@ class AssignmentController extends Controller
 
         $assignment->score = $request->score;
         $assignment->save();
+
+        $recentSubmission = recentSubmissions::where('assignment_id', $assignment->id)->first();
+        if ($recentSubmission) {
+            $recentSubmission->status = 'Reviewed';
+            $recentSubmission->due_date = now();
+            $recentSubmission->updated_by = Auth::id();
+            $recentSubmission->updated_at = now();
+            $recentSubmission->save();
+        }
 
         return back()->with('success', 'Nilai berhasil disimpan!');
     }

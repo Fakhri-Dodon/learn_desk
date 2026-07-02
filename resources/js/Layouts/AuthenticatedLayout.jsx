@@ -16,22 +16,23 @@ import {
     faBook,
     faStar,
     faBars,
+    faCircleUser,
     faMagnifyingGlass,
     faBell,
+    faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function AuthenticatedLayout({ header, children }) {
     const pageProps = usePage().props;
     const user = pageProps.auth?.user || {
-        name: 'Guest User',
-        role: 'student',
-        email: 'user@example.com'
+        name: "Guest User",
+        role: "student",
+        email: "user@example.com",
     };
     const { auth, materis = [] } = pageProps;
     const { url } = usePage();
 
-    const canCreateMateri =
-        user?.role === "admin" || user?.role === "teacher";
+    const canCreateMateri = user?.role === "admin" || user?.role === "teacher";
 
     const StudentTask = user?.role === "student";
 
@@ -48,69 +49,6 @@ export default function AuthenticatedLayout({ header, children }) {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedMateriDelete, setSelectedMateriDelete] = useState(null);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: "",
-        link: "",
-        description: "",
-    });
-
-    const {
-        data: editData,
-        setData: setEditData,
-        patch: patchEdit,
-        processing: processingEdit,
-        errors: errorsEdit,
-        reset: resetEdit,
-        clearErrors: clearErrorsEdit,
-    } = useForm({
-        title: "",
-    });
-
-    const { delete: destroy, processing: processingDelete } = useForm();
-
-    const submit = (e) => {
-        e.preventDefault();
-        post("/materi", {
-            onSuccess: () => {
-                closeModal();
-                reset();
-            },
-        });
-    };
-
-    const openEditModal = (materi) => {
-        setSelectedMateriEdit(materi);
-        setEditData("title", materi.title);
-        clearErrorsEdit();
-        setIsEditModalOpen(true);
-    };
-
-    const submitEdit = (e) => {
-        e.preventDefault();
-        patchEdit(`/materi/${selectedMateriEdit.id}`, {
-            onSuccess: () => {
-                setIsEditModalOpen(false);
-                setSelectedMateriEdit(null);
-                resetEdit();
-            },
-        });
-    };
-
-    const openDeleteModal = (materi) => {
-        setSelectedMateriDelete(materi);
-        setIsDeleteModalOpen(true);
-    };
-
-    const confirmDelete = (e) => {
-        e.preventDefault();
-        destroy(`/materi/${selectedMateriDelete.id}`, {
-            onSuccess: () => {
-                setIsDeleteModalOpen(false);
-                setSelectedMateriDelete(null);
-            },
-        });
-    };
-
     // Navigation menu items with dynamic active states
     const navItems = [
         {
@@ -119,25 +57,31 @@ export default function AuthenticatedLayout({ header, children }) {
             href: route("dashboard"),
             active: url === "/dashboard" || url.endsWith("/dashboard"),
         },
-        {
+        (user?.role === "teacher") && {
             label: "Manage Materials",
             icon: faBook,
             href: "/materi",
-            active: url.includes("/materi") && !url.includes("/materi/"),
+            active: url.startsWith("/materi"),
         },
-        {
+        (user?.role === "student") && {
             label: "Assignments",
             icon: faTasks,
             href: route("student.assignments.index"),
             active: url.includes("tugas-saya") || url.includes("assignment"),
         },
-        {
-            label: "Grading",
-            icon: faStar,
-            href: "/grading",
-            active: url.includes("grading"),
-        },
-    ];
+        (user?.role === "admin") && { 
+            label: "Manage Users",
+            icon: faCircleUser,
+            href: "/users-managements",
+            active: url.startsWith("/users-managements"),
+        }
+        // {
+        //     label: "Grading",
+        //     icon: faStar,
+        //     href: "/grading",
+        //     active: url.includes("grading"),
+        // },
+    ].filter(Boolean);
 
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -151,11 +95,27 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className="flex items-center justify-center h-16 border-b border-gray-200 px-4">
                     <Link href="/">
                         <div className="flex items-center gap-3 overflow-hidden">
-                            <ApplicationLogo className="h-8 w-auto fill-current text-gray-800 flex-shrink-0" />
+                            <ApplicationLogo className="h-9 w-auto fill-current text-gray-800 flex-shrink-0" />
                             {isSidebarOpen && (
                                 <div className="whitespace-nowrap">
-                                    <p className="text-xs font-bold text-gray-900">EduStream</p>
-                                    <p className="text-xs text-gray-600">Instructor Portal</p>
+                                    <p className="text-xs font-bold text-gray-900">
+                                        Learn Desk
+                                    </p>
+                                    {user?.role === "teacher" && (
+                                        <p className="text-xs text-gray-600">
+                                            Instructor Portal
+                                        </p>
+                                    )}
+                                    {user?.role === "student" && (
+                                        <p className="text-xs text-gray-600">
+                                            Student Portal
+                                        </p>
+                                    )}
+                                    {user?.role === "admin" && (
+                                        <p className="text-xs text-gray-600">
+                                            Admin Portal
+                                        </p>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -190,7 +150,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     })}
 
                     {/* New Materi Button */}
-                    {canCreateMateri && (
+                    {/* {canCreateMateri && (
                         <button
                             onClick={openModal}
                             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium transition-all text-sm mt-4 ${
@@ -205,14 +165,25 @@ export default function AuthenticatedLayout({ header, children }) {
                             />
                             {isSidebarOpen && <span>New Materi</span>}
                         </button>
-                    )}
+                    )} */}
                 </nav>
 
                 {/* Footer */}
-                <div className="border-t border-gray-200 p-3">
-                    <button className="w-full text-center text-xs text-gray-500 hover:text-gray-700 py-2">
-                        {isSidebarOpen ? "Settings" : "⚙️"}
-                    </button>
+                <div className="border-t border-gray-200 p-4 bg-gray-50/50">
+                    <Link
+                        href={route("logout")}
+                        method="post"
+                        as="button" // PENTING: Memberitahu Inertia untuk merender ini sebagai tombol secara internal
+                        type="button"
+                        className="w-full flex items-center justify-center sm:justify-start gap-3 px-3 py-2.5 text-sm font-medium text-gray-600 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-200 group"
+                    >
+                        <FontAwesomeIcon
+                            icon={faArrowRightFromBracket}
+                            className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors"
+                        />
+                        {/* Jika Anda memiliki state isSidebarOpen, bungkus teks 'Logout' ini dengan kondisi tersebut */}
+                        <span className="whitespace-nowrap">Logout</span>
+                    </Link>
                 </div>
             </aside>
 
@@ -225,27 +196,30 @@ export default function AuthenticatedLayout({ header, children }) {
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition text-gray-700"
                         >
-                            <FontAwesomeIcon icon={faBars} className="w-5 h-5" />
+                            <FontAwesomeIcon
+                                icon={faBars}
+                                className="w-5 h-5"
+                            />
                         </button>
-                        
+
                         {/* Search Bar */}
-                        <div className="hidden sm:flex items-center gap-3 bg-gray-100 rounded-lg px-4 py-2.5 flex-1 max-w-sm">
+                        {/* <div className="hidden sm:flex items-center gap-3 bg-gray-100 rounded-lg px-4 py-2.5 flex-1 max-w-sm">
                             <FontAwesomeIcon icon={faMagnifyingGlass} className="w-4 h-4 text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="Search students, courses..."
                                 className="bg-transparent outline-none flex-1 text-sm text-gray-700 placeholder-gray-500"
                             />
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Right Side Actions */}
                     <div className="flex items-center gap-4">
                         {/* Notification Button */}
-                        <button className="p-2 hover:bg-gray-100 rounded-lg transition text-gray-700 relative">
+                        {/* <button className="p-2 hover:bg-gray-100 rounded-lg transition text-gray-700 relative">
                             <FontAwesomeIcon icon={faBell} className="w-5 h-5" />
                             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                        </button> */}
 
                         {/* User Dropdown */}
                         <Dropdown>
@@ -281,210 +255,6 @@ export default function AuthenticatedLayout({ header, children }) {
                     {children}
                 </main>
             </div>
-
-            {/* Modals */}
-            <Modal show={isModalOpen} onClose={closeModal}>
-                <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
-                        Add New Materi
-                    </h2>
-
-                    <form onSubmit={submit}>
-                        <div className="mt-4">
-                            <label
-                                htmlFor="title"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Title{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="title"
-                                id="title"
-                                required
-                                placeholder="Seni Musik"
-                                value={data.title}
-                                onChange={(e) =>
-                                    setData("title", e.target.value)
-                                }
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            />
-                            {errors.title && (
-                                <div className="text-red-500 text-xs mt-1">
-                                    {errors.title}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="mt-4">
-                            <label
-                                htmlFor="link"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Link
-                            </label>
-                            <input
-                                type="text"
-                                name="link"
-                                id="link"
-                                placeholder="https://www.youtube.com/watch?v=example"
-                                value={data.link}
-                                onChange={(e) =>
-                                    setData("link", e.target.value)
-                                }
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            />
-                            {errors.link && (
-                                <div className="text-red-500 text-xs mt-1">
-                                    {errors.link}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="mt-4">
-                            <label
-                                htmlFor="description"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Description
-                            </label>
-                            <textarea
-                                name="description"
-                                id="description"
-                                rows="6"
-                                value={data.description}
-                                onChange={(e) =>
-                                    setData("description", e.target.value)
-                                }
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            ></textarea>
-                            {errors.description && (
-                                <div className="text-red-500 text-xs mt-1">
-                                    {errors.description}
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                type="button"
-                                onClick={closeModal}
-                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md mr-2"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className={`px-4 py-2 bg-indigo-600 text-white rounded-md ${
-                                    processing
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : ""
-                                }`}
-                            >
-                                {processing ? "Saving..." : "Save"}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </Modal>
-
-            <Modal
-                show={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-            >
-                <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
-                        Rename Materi
-                    </h2>
-                    <form onSubmit={submitEdit}>
-                        <div className="mt-4">
-                            <label
-                                htmlFor="title"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Title{" "}
-                                <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                id="title"
-                                required
-                                value={editData.title}
-                                onChange={(e) =>
-                                    setEditData("title", e.target.value)
-                                }
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                            />
-                            {errorsEdit.title && (
-                                <div className="text-red-500 text-xs mt-1">
-                                    {errorsEdit.title}
-                                </div>
-                            )}
-                        </div>
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                type="button"
-                                onClick={() => setIsEditModalOpen(false)}
-                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md mr-2 hover:bg-gray-300"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={processingEdit}
-                                className={`px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 ${
-                                    processingEdit
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : ""
-                                }`}
-                            >
-                                {processingEdit ? "Saving..." : "Save Changes"}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </Modal>
-
-            <Modal
-                show={isDeleteModalOpen}
-                onClose={() => setIsDeleteModalOpen(false)}
-            >
-                <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-4">
-                        Delete Confirmation
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                        Are you sure you want to delete{" "}
-                        <span className="font-bold text-gray-900">
-                            "{selectedMateriDelete?.title}"
-                        </span>
-                        ? All of its resources and data will be permanently
-                        deleted. This action cannot be undone.
-                    </p>
-                    <div className="mt-6 flex justify-end">
-                        <button
-                            type="button"
-                            onClick={() => setIsDeleteModalOpen(false)}
-                            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md mr-2 hover:bg-gray-300"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={confirmDelete}
-                            disabled={processingDelete}
-                            className={`px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 ${
-                                processingDelete
-                                    ? "opacity-50 cursor-not-allowed"
-                                    : ""
-                            }`}
-                        >
-                            {processingDelete ? "Deleting..." : "Delete Materi"}
-                        </button>
-                    </div>
-                </div>
-            </Modal>
         </div>
     );
 }

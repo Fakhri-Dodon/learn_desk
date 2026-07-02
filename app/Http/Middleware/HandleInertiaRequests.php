@@ -4,6 +4,10 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
+use App\Models\User;
+use App\Models\assignment;
+use App\Models\materi;
+use App\Models\recentSubmissions;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -34,8 +38,21 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'users' => $request->user() ? User::where('deleted', 0)->get() : [],
 
-            'materis' => $request->user() ? $request->user()->materis()->where('deleted', 0)->get() : [],
-        ];
+            'assigments' => $request->user() ? assignment::where('deleted', 0)
+                ->with(['materi', 'user'])
+                ->get() : [],
+
+            'materis' => $request->user() ? materi::where('deleted', 0)
+                ->with('user')
+                ->get() : [],
+
+            'recentSubmissions' => $request->user() ? recentSubmissions::where('deleted', 0)
+                ->with(['user', 'assignment.materi'])
+                ->latest()
+                ->take(5)
+                ->get() : [],
+            ];
     }
 }

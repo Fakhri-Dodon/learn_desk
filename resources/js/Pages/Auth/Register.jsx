@@ -8,6 +8,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
+        class: '',
         email: '',
         password: '',
         password_confirmation: '',
@@ -41,6 +42,25 @@ export default function Register() {
                     />
 
                     <InputError message={errors.name} className="mt-2" />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="class" value="Class" />
+
+                    <select
+                        id="class"
+                        name="class"
+                        value={data.class}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        onChange={(e) => setData('class', e.target.value)}
+                        required
+                    >
+                        <option value="10">Class 10</option>
+                        <option value="11">Class 11</option>
+                        <option value="12">Class 12</option>
+                    </select>
+
+                    <InputError message={errors.class} className="mt-2" />
                 </div>
 
                 <div className="mt-4">

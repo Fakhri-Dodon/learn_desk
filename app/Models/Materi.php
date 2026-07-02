@@ -12,6 +12,7 @@ class Materi extends Model
         'url', 
         'link', 
         'description', 
+        'class',
         'deleted', 
         'created_by', 
         'updated_by', 

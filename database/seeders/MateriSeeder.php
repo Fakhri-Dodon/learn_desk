@@ -22,6 +22,7 @@ class MateriSeeder extends Seeder
                 'description' => 'Deskripsi materi matematika',
                 'created_by' => 1, // Ganti dengan ID user yang sesuai
                 'updated_by' => 1, // Ganti dengan ID user yang sesuai
+                'class' => 11, // Ganti dengan kelas yang sesuai
             ],
             [
                 'user_id' => 1, // Ganti dengan ID user yang sesuai
@@ -29,6 +30,7 @@ class MateriSeeder extends Seeder
                 'url' => 'materi-bahasa-indonesia',
                 'link' => 'https://youtu.be/hU7c6IzqZUY?si=y9YIxcR93zLr2ud2',
                 'description' => 'Deskripsi materi bahasa indonesia',
+                'class' => 11, // Ganti dengan kelas yang sesuai
                 'created_by' => 1, // Ganti dengan ID user yang sesuai
                 'updated_by' => 1, 
             ],
