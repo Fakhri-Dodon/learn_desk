@@ -61,12 +61,18 @@ export default function StudentAssignmentIndex({ assignments }) {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <Link 
-                                                href={`/tugas-saya/${assignment.id}`}
-                                                className="text-indigo-600 hover:text-indigo-900 font-semibold"
-                                            >
-                                                {assignment.status === 'Sudah Mengumpulkan' ? 'Lihat Jawaban' : 'Kerjakan'}
-                                            </Link>
+                                            {assignment.status === 'Sudah Mengumpulkan' ? (
+                                                <span className="text-gray-900 font-bold">
+                                                    Score: {assignment.score !== null ? assignment.score : 'Belum dinilai'}
+                                                </span>
+                                            ) : (
+                                                <Link 
+                                                    href={`/tugas-saya/${assignment.id}`}
+                                                    className="text-indigo-600 hover:text-indigo-900 font-semibold"
+                                                >
+                                                    Kerjakan
+                                                </Link>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}

@@ -56,7 +56,7 @@ class AssignmentController extends Controller
             'student_ids' => 'required|array',
             'student_ids.*' => 'exists:users,id',
             'submission_type' => 'required|string|in:link_video,foto,google_form',
-            'google_form_link' => 'nullable|url',
+            'google_form_link' => 'nullable',
             'due_date' => 'required|date',
             'description' => 'nullable|string'
         ]);
